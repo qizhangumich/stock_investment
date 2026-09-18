@@ -33,6 +33,13 @@ Historical Market Data (yfinance, modular)
 | `scripts/register_daily_task.ps1` | Registers the Windows scheduled task for daily automation |
 | `instructions/v1.md` | Full product specification |
 
+## Live deployment
+
+- **Dashboard:** https://stock-investment-dun.vercel.app (Vercel project `stock-investment`)
+- The deployed app reads a bundled snapshot at `dashboard/db/evolution.db`; the daily task
+  (`scripts/daily_evolve_and_publish.ps1`) evolves locally, refreshes the snapshot, pushes to
+  GitHub, and redeploys with `vercel deploy --prod`.
+
 ## Quick start
 
 ```bash
