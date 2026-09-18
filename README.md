@@ -33,12 +33,19 @@ Historical Market Data (yfinance, modular)
 | `scripts/register_daily_task.ps1` | Registers the Windows scheduled task for daily automation |
 | `instructions/v1.md` | Full product specification |
 
-## Live deployment
+## Live deployment & automation
 
 - **Dashboard:** https://stock-investment-dun.vercel.app (Vercel project `stock-investment`)
-- The deployed app reads a bundled snapshot at `dashboard/db/evolution.db`; the daily task
-  (`scripts/daily_evolve_and_publish.ps1`) evolves locally, refreshes the snapshot, pushes to
-  GitHub, and redeploys with `vercel deploy --prod`.
+- The deployed app reads a bundled snapshot at `dashboard/db/evolution.db`.
+- **Daily runs happen remotely on GitHub Actions** (`.github/workflows/daily-evolution.yml`,
+  weekdays 22:30 UTC): restore DB from the tracked snapshot → run 3 evolution generations →
+  commit the updated DB + price cache → deploy to Vercel. No local machine needed.
+- Required repo secrets (GitHub → Settings → Secrets and variables → Actions):
+  - `VERCEL_TOKEN` — create at https://vercel.com/account/settings/tokens (needed for deploys)
+  - `OPENAI_API_KEY` — optional; enables LLM-driven mutation (heuristic-only without it)
+- Trigger a run manually: GitHub → Actions → "Daily Evolution" → Run workflow.
+- `scripts/daily_evolve_and_publish.ps1` + the (currently disabled) Windows scheduled task
+  remain as a local fallback.
 
 ## Quick start
 

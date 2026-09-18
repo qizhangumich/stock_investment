@@ -5,7 +5,9 @@ __pycache__/
 
 # Data & cache (regenerate with run_daily.py). Root db/ is the working DB;
 # a snapshot copy is tracked at dashboard/db/evolution.db for Vercel.
-/data/
+# The price CSV is tracked so GitHub Actions has a fallback if yfinance is rate-limited.
+/data/*
+!/data/TSLA_daily.csv
 /db/
 
 # Vercel
