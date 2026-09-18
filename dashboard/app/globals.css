@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0e14;
+  --color-panel: #0e131c;
+  --color-panel2: #131a26;
+  --color-bd: #1c2434;
+  --color-bd2: #2a3447;
+  --color-fg: #dbe4f0;
+  --color-muted: #7d8aa0;
+  --color-faint: #566175;
+  --color-pos: #4ade80;
+  --color-neg: #f87171;
+  --color-amber: #fbbf24;
+  --color-gold: #f5b942;
+  --color-accent: #60a5fa;
+  --color-violet: #a78bfa;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-feature-settings: "tnum";
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.3);
+}
+
+/* thin scrollbars that fit the dark theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-bd2) transparent;
+}
+
+/* numeric cells */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+details.tree > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.tree > summary::-webkit-details-marker {
+  display: none;
+}
+details.tree > summary .caret::before {
+  content: "+";
+}
+details.tree[open] > summary .caret::before {
+  content: "\2212";
+}

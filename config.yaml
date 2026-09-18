@@ -1,0 +1,65 @@
+# AlphaEvolve Investment Lab — Phase One configuration
+
+ticker: TSLA
+start_date: "2010-06-29"   # TSLA IPO
+
+data:
+  source: yfinance          # modular: swap for institutional API later
+  cache_dir: data
+
+database:
+  path: db/evolution.db     # SQLite for Phase One; schema mirrors Postgres/Supabase
+
+splits:
+  train_start: "2012-01-01"
+  train_end: "2019-12-31"
+  validation_start: "2020-01-01"
+  validation_end: "2022-12-31"
+  hidden_test_start: "2023-01-01"   # NEVER used for selection or mutation
+
+walk_forward:
+  train_years: 4
+  test_years: 1
+  first_test_year: 2016
+  last_test_year: 2022     # walk-forward never enters hidden test
+
+costs:
+  transaction_cost_bps: 5
+  slippage_bps: 5
+
+evolution:
+  population_size: 40
+  children_per_generation: 24
+  crossover_fraction: 0.25
+  elite_fraction: 0.20
+  seed: 42
+  # Cascade thresholds
+  stage1_min_sharpe: -0.5        # cheap screen on recent 3y of train
+  stage2_min_fitness: 0.05
+  elite_min_validation_sharpe: 0.35
+  elite_max_validation_drawdown: -0.65
+
+llm_mutation:
+  enabled: auto              # auto = use the provider's API if its key env var is set, else heuristic only
+  provider: openai           # openai (OPENAI_API_KEY) | anthropic (ANTHROPIC_API_KEY)
+  model: gpt-5-mini          # for anthropic use e.g. claude-sonnet-5
+  fraction: 0.35             # fraction of children produced by LLM when available
+
+fitness:
+  # configurable composite fitness weights (spec §42)
+  weights:
+    cagr: 0.25
+    sharpe: 0.20
+    sortino: 0.15
+    calmar: 0.15
+    robustness: 0.10
+    regime_stability: 0.10
+    turnover_penalty: 0.025
+    complexity_penalty: 0.025
+
+regimes:
+  vol_window: 20
+  vol_low_pct: 0.33
+  vol_high_pct: 0.67
+  bubble_expensive_pct: 0.75
+  bubble_extreme_pct: 0.95

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Data & cache (regenerate with run_daily.py). Root db/ is the working DB;
+# a snapshot copy is tracked at dashboard/db/evolution.db for Vercel.
+/data/
+/db/
+
+# Vercel
+.vercel/
+
+# Node / Next.js
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
+dashboard/next-env.d.ts
+
+# misc
+.env
+*.log
