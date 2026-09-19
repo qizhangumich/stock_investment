@@ -1,0 +1,71 @@
+flowchart TD
+    subgraph DAILY["run_daily.py — daily cycle (GitHub Actions / local)"]
+        MAIN["main()"]
+    end
+
+    subgraph DATA["engine/data.py + features.py + regimes.py"]
+        LMD["load_market_data(ticker)\nyfinance + CSV cache"]
+        CF["compute_features(df)\n~40 indicators, trailing-only"]
+        CR["classify_regimes(features)\ntrend x volatility x bubble"]
+    end
+
+    subgraph EVO["engine/evolution.py"]
+        LAB["Lab.__init__\nload data, features, regimes, splits"]
+        BENCH["save_benchmarks()\nBENCH_BH, BENCH_SMA200 (fixed)"]
+        RG["run_generation(lab, conn, gen)"]
+        LP["load_population()\ntop 40 ELITE/SURVIVED"]
+        EVAL["Lab.evaluate(genome)\n4-stage cascade"]
+        WF["Lab.walk_forward()\nyearly folds 2016-2022"]
+        FIT["Lab.fitness()\ncomposite score, config weights"]
+        ARCH["_update_archive()\nMAP-Elites: family x holding period"]
+    end
+
+    subgraph MUT["engine/mutation.py"]
+        HM["heuristic_mutate()\nparameter + structural ops"]
+        XO["crossover(a, b)\ncombine two parents"]
+        LLM["llm_mutate()\nOpenAI/Anthropic rewrites genome"]
+    end
+
+    subgraph GEN["engine/genome.py"]
+        VAL["validate(genome)"]
+        GP["generate_positions(genome)\nentry/exit state machine"]
+        EC["eval_condition(tree)\nvectorized rule evaluation"]
+        RC["render_code(genome)\npseudocode for dashboard + LLM"]
+    end
+
+    subgraph BT["engine/backtest.py + metrics.py"]
+        RB["run_backtest(positions, prices)\n1-day lag + costs"]
+        CM["compute_metrics(bt)\n30+ stats, expectancy"]
+        RP["regime_performance()\nreturn by regime label"]
+    end
+
+    subgraph REP["engine/report.py + db.py"]
+        DBW["db.py\nSQLite: strategies, lineage,\nbacktests, trades, regimes"]
+        BDR["build_daily_report()\ndaily_evolution row"]
+        CONS["population_consensus()\nlong/cash vote of 40 strategies"]
+    end
+
+    subgraph WEB["dashboard/ (Next.js on Vercel)"]
+        Q["lib/queries.ts -> node:sqlite (read-only)"]
+        PAGES["overview / evolution / strategies\nregimes / daily-report / evolution-tree"]
+    end
+
+    MAIN --> LAB
+    LAB --> LMD --> CF --> CR
+    MAIN --> BENCH --> RB
+    MAIN --> RG
+    RG --> LP
+    RG --> HM & XO & LLM
+    HM & XO & LLM --> VAL
+    RG --> EVAL
+    EVAL --> GP --> EC
+    EVAL --> RB --> CM
+    EVAL --> WF --> RB
+    EVAL --> FIT
+    EVAL --> RP
+    RG --> ARCH
+    RG --> DBW
+    VAL --> RC --> DBW
+    MAIN --> BDR --> CONS --> GP
+    BDR --> DBW
+    DBW --> Q --> PAGES
